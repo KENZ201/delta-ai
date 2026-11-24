@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DELTA KING AI</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#07111f;color:#eaf3ff;
+ font-family:Arial,sans-serif;height:100vh;overflow:hidden;
+}
+.app{display:flex;height:100vh}
+.sidebar{
+ width:265px;background:#091625;border-right:1px solid #1c3048;
+ padding:20px;display:flex;flex-direction:column;
+}
+.logo{font-size:23px;font-weight:900;letter-spacing:2px;color:#65baff;margin-bottom:30px}
+.logo span{color:white}
+.newchat{
+ width:100%;padding:13px;border:1px solid #287bca;
+ background:#102b46;color:white;border-radius:10px;
+ cursor:pointer;font-size:14px;
+}
+.newchat:hover{background:#17436b}
+.label{font-size:11px;letter-spacing:2px;color:#718ba9;margin:25px 5px 10px}
+#chatHistory{overflow-y:auto;flex:1}
+.history-item{display:flex;gap:5px;margin-bottom:7px}
+.history-open{
+ flex:1;min-width:0;text-align:left;overflow:hidden;
+ white-space:nowrap;text-overflow:ellipsis;padding:11px;
+ background:#112238;color:#c8ddf4;border:1px solid transparent;
+ border-radius:8px;cursor:pointer;
+}
+.history-open:hover{background:#1b3857;border-color:#318cff}
+.history-delete{
+ background:#281a26;color:#ff8b9c;border:0;
+ border-radius:8px;padding:8px;cursor:pointer;
+}
+.sidebar-footer{color:#627a98;font-size:11px;padding-top:12px}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{
+ height:65px;border-bottom:1px solid #1c3048;
+ display:flex;align-items:center;justify-content:space-between;
+ padding:0 25px;
+}
+.top-title{font-weight:bold;letter-spacing:2px}
+.mode{
+ background:#10243a;color:#80c5ff;border:1px solid #27517a;
+ padding:9px 15px;border-radius:20px;cursor:pointer;
+}
+.chat-area{flex:1;overflow-y:auto;padding:25px}
+.welcome{text-align:center;margin:9vh auto 35px;max-width:600px}
+.orb{
+ width:115px;height:115px;margin:0 auto 25px;border-radius:50%;
+ background:radial-gradient(circle at 35% 30%,#b7eaff,#348bff 35%,#08244d 70%);
+ box-shadow:0 0 35px #168bff,0 0 90px #0872ff55;
+ animation:pulse 3s infinite alternate;
+}
+@keyframes pulse{to{transform:scale(1.08);box-shadow:0 0 60px #168bff}}
+.welcome h1{font-size:35px;margin:10px}
+.welcome p{color:#8ba5c2;line-height:1.6}
+.messages{max-width:850px;margin:auto}
+.message{
+ max-width:80%;padding:14px 17px;margin:15px 0;
+ border-radius:15px;line-height:1.55;white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+.user{background:#174675;margin-left:auto;border:1px solid #2877ba}
+.ai{background:#122238;border:1px solid #243c58;margin-right:auto}
+.thinking{color:#75bdff;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.3}}
+.composer-wrap{padding:15px 25px 22px;border-top:1px solid #1c3048}
+.composer{
+ max-width:900px;margin:auto;display:flex;gap:9px;align-items:center;
+ background:#102036;border:1px solid #29435f;border-radius:15px;padding:9px;
+}
+.composer textarea{
+ flex:1;resize:none;background:transparent;border:0;outline:0;
+ color:white;font-size:15px;min-height:35px;max-height:120px;padding:9px;
+}
+.tool{
+ background:#1a304a;color:#a9d8ff;border:0;border-radius:9px;
+ padding:11px;cursor:pointer;font-size:16px;
+}
+.send{background:#1685ef;color:white;padding:11px 17px}
+.tool:hover{filter:brightness(1.3)}
+#imagePreview{max-width:100px;max-height:80px;display:none;margin:8px}
+.note{text-align:center;color:#657e99;font-size:11px;margin-top:10px}
+@media(max-width:650px){
+ .sidebar{width:90px;padding:10px}
+ .logo{font-size:12px;letter-spacing:0}
+ .newchat{font-size:10px;padding:10px 3px}
+ .label{font-size:9px}
+ .history-open{font-size:10px;padding:8px}
+ .history-delete{padding:5px}
+ .topbar{padding:0 12px}
+ .chat-area{padding:12px}
+ .composer-wrap{padding:10px}
+ .tool{padding:9px}
+ .welcome h1{font-size:27px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar">
+ <div class="logo">DELTA <span>KING</span></div>
+ <button class="newchat" onclick="newChat()">＋ New Chat</button>
+ <div class="label">RECENT CHATS</div>
+ <div id="chatHistory"></div>
+ <div class="sidebar-footer">DELTA SYSTEM V1.0</div>
+</aside>
+
+<main class="main">
+ <header class="topbar">
+  <div class="top-title">DELTA AI</div>
+  <button class="mode" id="modeButton" onclick="switchMode()">SMART MODE</button>
+ </header>
+
+ <section class="chat-area" id="chatArea">
+  <div class="welcome" id="welcome">
+   <div class="orb"></div>
+   <h1>WELCOME TO DELTA KING AI</h1>
+   <p>Your ideas. Your questions. Your universe.<br>
+   Start a conversation with DELTA.</p>
+  </div>
+  <div class="messages" id="messages"></div>
+ </section>
+
+ <div class="composer-wrap">
+  <div class="composer">
+   <input type="file" id="imageInput" accept="image/*" hidden>
+   <button class="tool" onclick="document.getElementById('imageInput').click()" title="Upload image">＋</button>
+   <textarea id="prompt" placeholder="Message DELTA AI..." rows="1"></textarea>
+   <button class="tool" onclick="voiceInput()" title="Voice input">🎙</button>
+   <button class="tool" onclick="speakLast()" title="Read last answer">🔊</button>
+   <button class="tool send" onclick="sendMessage()">➤</button>
+  </div>
+  <img id="imagePreview">
+  <div class="note">DELTA KING AI · Your personal AI workspace</div>
+ </div>
+</main>
+</div>
+
+<script>
+const STORAGE_KEY="DELTA_KING_CONVERSATIONS_V1";
+let chats=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+let activeChat=null;
+let mode="SMART";
+let selectedImage=null;
+
+const messages=document.getElementById("messages");
+const welcome=document.getElementById("welcome");
+const promptBox=document.getElementById("prompt");
+
+function saveChats(){
+ localStorage.setItem(STORAGE_KEY,JSON.stringify(chats));
+}
+
+function renderHistory(){
+ const box=document.getElementById("chatHistory");
+ box.innerHTML="";
+ chats.forEach(chat=>{
+  const row=document.createElement("div");
+  row.className="history-item";
+
+  const open=document.createElement("button");
+  open.className="history-open";
+  open.textContent="◈ "+chat.title;
+  open.onclick=()=>openChat(chat.id);
+
+  const del=document.createElement("button");
+  del.className="history-delete";
+  del.textContent="×";
+  del.title="Delete chat";
+  del.onclick=()=>{
+   if(!confirm("Delete this conversation?"))return;
+   chats=chats.filter(c=>c.id!==chat.id);
+   if(activeChat===chat.id){
+    activeChat=null;
+    messages.innerHTML="";
+    welcome.style.display="block";
+   }
+   saveChats();
+   renderHistory();
+  };
+
+  row.append(open,del);
+  box.appendChild(row);
+ });
+}
+
+function newChat(){
+ const chat={
+  id:Date.now(),
+  title:"New Conversation",
+  messages:[]
+ };
+ chats.unshift(chat);
+ activeChat=chat.id;
+ messages.innerHTML="";
+ welcome.style.display="block";
+ saveChats();
+ renderHistory();
+ promptBox.focus();
+}
+
+function openChat(id){
+ const chat=chats.find(c=>c.id===id);
+ if(!chat)return;
+ activeChat=id;
+ messages.innerHTML="";
+ chat.messages.forEach(m=>addMessage(m.text,m.type,false));
+ welcome.style.display=chat.messages.length?"none":"block";
+}
+
+function ensureChat(){
+ if(!activeChat)newChat();
+ return chats.find(c=>c.id===activeChat);
+}
+
+function addMessage(text,type,save=true){
+ const div=document.createElement("div");
+ div.className="message "+type;
+ div.textContent=text;
+ messages.appendChild(div);
+ welcome.style.display="none";
+
+ if(save){
+  const chat=ensureChat();
+  chat.messages.push({text,type});
+  if(chat.title==="New Conversation"&&type==="user"){
+   chat.title=text.slice(0,28)+(text.length>28?"...":"");
+  }
+  saveChats();
+  renderHistory();
+ }
+ document.getElementById("chatArea").scrollTop=
+ document.getElementById("chatArea").scrollHeight;
+}
+
+function sendMessage(){
+ const text=promptBox.value.trim();
+ if(!text&&!selectedImage)return;
+
+ if(text)addMessage(text,"user");
+ if(selectedImage){
+  addMessage("Image attached: "+selectedImage.name,"user");
+ }
+
+ promptBox.value="";
+ selectedImage=null;
+ document.getElementById("imagePreview").style.display="none";
+
+ const thinking=document.createElement("div");
+ thinking.className="message ai thinking";
+ thinking.textContent="DELTA is thinking...";
+ messages.appendChild(thinking);
+
+ setTimeout(()=>{
+  thinking.remove();
+  let response;
+
+  if(mode==="KING"){
+   response="👑 KING MODE ACTIVATED.\n\nYour request has been received. DELTA KING AI is ready to help you plan, create and explore. A real AI backend is needed for intelligent live answers.";
+  }else{
+   response="Hello! I'm DELTA AI. Your interface is working!\n\nI can demonstrate the chat interface, save conversations and support voice input. Connect an AI backend to enable real intelligent answers.";
+  }
+
+  addMessage(response,"ai");
+ },1000);
+}
+
+function switchMode(){
+ mode=mode==="SMART"?"KING":"SMART";
+ document.getElementById("modeButton").textContent=mode+" MODE";
+}
+
+function voiceInput(){
+ const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SpeechRecognition){
+  alert("Voice recognition is not supported in this browser.");
+  return;
+ }
+ const recognition=new SpeechRecognition();
+ recognition.lang="en-US";
+ recognition.onresult=e=>{
+  promptBox.value=e.results[0][0].transcript;
+ };
+ recognition.start();
+}
+
+function speakLast(){
+ const last=[...messages.querySelectorAll(".ai")].pop();
+ if(!last){alert("No AI response yet.");return;}
+ speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(last.textContent);
+ speechSynthesis.speak(utterance);
+}
+
+document.getElementById("imageInput").addEventListener("change",e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ selectedImage=file;
+ const preview=document.getElementById("imagePreview");
+ preview.src=URL.createObjectURL(file);
+ preview.style.display="block";
+});
+
+promptBox.addEventListener("keydown",e=>{
+ if(e.key==="Enter"&&!e.shiftKey){
+  e.preventDefault();
+  sendMessage();
+ }
+});
+
+renderHistory();
+console.log("DELTA KING AI SYSTEM ONLINE");
+alert("DELTA KING AI IS ALIVE!");
+</script>
+</body>
+</html>
