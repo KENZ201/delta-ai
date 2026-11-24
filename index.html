@@ -41,7 +41,6 @@ body{
 }
 
 button,textarea,input,select{font:inherit}
-
 button{cursor:pointer}
 
 .app{display:flex;height:100vh}
@@ -345,6 +344,7 @@ button{cursor:pointer}
 .settings-page.active{display:block}
 
 .settings-page h3{margin:0 0 8px}
+
 .settings-description{
  color:var(--muted);
  font-size:13px;
@@ -455,7 +455,7 @@ button{cursor:pointer}
  <div class="label">RECENT CHATS</div>
  <div id="chatHistory"></div>
 
- <div class="sidebar-footer">DELTA SYSTEM V2.0</div>
+ <div class="sidebar-footer">DELTA SYSTEM V2.1</div>
 </aside>
 
 <main class="main">
@@ -488,7 +488,7 @@ button{cursor:pointer}
 
   <input type="file" id="imageInput" accept="image/*" hidden>
 
-  <button class="tool"
+  <button class="tool" id="uploadButton"
    onclick="document.getElementById('imageInput').click()"
    title="Upload image">＋</button>
 
@@ -543,8 +543,6 @@ button{cursor:pointer}
 
    <div class="settings-content">
 
-    <!-- VOICE -->
-
     <div class="settings-page active" id="page-voice">
 
      <h3>Voice Settings</h3>
@@ -586,8 +584,6 @@ button{cursor:pointer}
     </div>
 
 
-    <!-- APPEARANCE -->
-
     <div class="settings-page" id="page-appearance">
 
      <h3>Appearance</h3>
@@ -607,14 +603,11 @@ button{cursor:pointer}
     </div>
 
 
-    <!-- RESPONSE QUALITY -->
-
     <div class="settings-page" id="page-quality">
 
      <h3>Response Preferences</h3>
      <p class="settings-description">
-      Choose your preferred answer style. These preferences are saved on this device;
-      the current AI backend does not yet apply them.
+      These preferences are sent to the DELTA AI backend with each message.
      </p>
 
      <div class="setting-card">
@@ -641,14 +634,10 @@ button{cursor:pointer}
     </div>
 
 
-    <!-- VISION -->
-
     <div class="settings-page" id="page-vision">
 
      <h3>Vision Settings</h3>
-     <p class="settings-description">
-      Manage image upload preferences.
-     </p>
+     <p class="settings-description">Manage image upload preferences.</p>
 
      <div class="setting-card">
       <h4>Image Upload</h4>
@@ -667,8 +656,6 @@ button{cursor:pointer}
 
     </div>
 
-
-    <!-- NOTIFICATIONS -->
 
     <div class="settings-page" id="page-notifications">
 
@@ -691,14 +678,12 @@ button{cursor:pointer}
     </div>
 
 
-    <!-- PRIVACY -->
-
     <div class="settings-page" id="page-privacy">
 
      <h3>Privacy & Data</h3>
 
      <p class="settings-description">
-      Your current conversations are stored in this browser's local storage.
+      Conversations are stored in this browser's local storage.
       They are not automatically synchronized between devices.
      </p>
 
@@ -718,8 +703,6 @@ button{cursor:pointer}
 
     </div>
 
-
-    <!-- COOKIES -->
 
     <div class="settings-page" id="page-cookies">
 
@@ -748,8 +731,6 @@ button{cursor:pointer}
     </div>
 
 
-    <!-- TERMS -->
-
     <div class="settings-page" id="page-terms">
 
      <h3>Terms of Use</h3>
@@ -758,36 +739,18 @@ button{cursor:pointer}
 
       <h4>Using DELTA AI</h4>
 
-      <p>
-       1. Use DELTA AI responsibly and lawfully.
-      </p>
+      <p>1. Use DELTA AI responsibly and lawfully.</p>
+      <p>2. Do not use the service to harm others or break the law.</p>
+      <p>3. AI-generated answers can contain mistakes. Check important information.</p>
+      <p>4. Do not submit passwords, private account details, or sensitive information.</p>
+      <p>5. Availability depends on the hosting platform and AI service.</p>
 
-      <p>
-       2. Do not use the service to harm others or break the law.
-      </p>
-
-      <p>
-       3. AI-generated answers can contain mistakes. Check important information.
-      </p>
-
-      <p>
-       4. Do not submit passwords, private account details, or sensitive information.
-      </p>
-
-      <p>
-       5. Availability depends on the hosting platform and AI service.
-      </p>
-
-      <p>
-       These are basic project usage guidelines, not a complete legal agreement.
-      </p>
+      <p>These are basic project usage guidelines, not a complete legal agreement.</p>
 
      </div>
 
     </div>
 
-
-    <!-- ABOUT -->
 
     <div class="settings-page" id="page-about">
 
@@ -797,7 +760,7 @@ button{cursor:pointer}
 
       <h4>DELTA KING AI</h4>
 
-      <p>Version: 2.0</p>
+      <p>Version: 2.1</p>
       <p>AI backend: Cloudflare Workers AI</p>
       <p>Interface: HTML, CSS and JavaScript</p>
 
@@ -816,7 +779,7 @@ button{cursor:pointer}
   </div>
 
   <footer class="settings-footer">
-   DELTA KING AI · SETTINGS CENTER · V2.0
+   DELTA KING AI · SETTINGS CENTER · V2.1
   </footer>
 
  </section>
@@ -984,11 +947,19 @@ function addMessage(text,type,save=true){
 
 }
 
+
+/* DELTA AI CONNECTION */
+
 async function sendMessage(){
 
  const text=promptBox.value.trim();
 
  if(!text&&!selectedImage)return;
+
+ if(selectedImage&&!settings.visionEnabled){
+  alert("Image uploads are disabled in Vision Settings.");
+  return;
+ }
 
  if(text)addMessage(text,"user");
 
@@ -1000,6 +971,7 @@ async function sendMessage(){
  selectedImage=null;
 
  document.getElementById("imagePreview").style.display="none";
+ document.getElementById("imageInput").value="";
 
  const thinking=document.createElement("div");
  thinking.className="message ai thinking";
@@ -1018,6 +990,21 @@ async function sendMessage(){
     content:m.text
    }));
 
+  /* Convert the interface settings into Worker settings */
+
+  const responseLength={
+   short:"short",
+   medium:"balanced",
+   long:"detailed"
+  }[settings.answerLength]||"balanced";
+
+  const responseStyle={
+   simple:"simple",
+   professional:"professional",
+   creative:"friendly",
+   technical:"professional"
+  }[settings.answerStyle]||"friendly";
+
   const response=await fetch(
    "https://delta-ai-brain.khanzazam007.workers.dev",
    {
@@ -1026,7 +1013,15 @@ async function sendMessage(){
      "Content-Type":"application/json"
     },
     body:JSON.stringify({
-     messages:conversation
+
+     messages:conversation,
+
+     mode:mode,
+
+     responseLength:responseLength,
+
+     responseStyle:responseStyle
+
     })
    }
   );
@@ -1061,6 +1056,9 @@ async function sendMessage(){
  }
 
 }
+
+
+/* MODE SYSTEM */
 
 function switchMode(){
 
@@ -1141,7 +1139,7 @@ function loadVoices(){
 
  }
 
- availableVoices.forEach((voice,index)=>{
+ availableVoices.forEach(voice=>{
 
   const option=document.createElement("option");
 
@@ -1159,9 +1157,7 @@ function loadVoices(){
 }
 
 if("speechSynthesis" in window){
-
  speechSynthesis.onvoiceschanged=loadVoices;
-
 }
 
 function speakText(text){
@@ -1287,14 +1283,6 @@ document.getElementById("visionEnabled").addEventListener("change",e=>{
 
 });
 
-document.querySelector(".composer .tool").addEventListener("click",()=>{
-
- if(!settings.visionEnabled){
-  alert("Image selection is disabled in Vision Settings.");
- }
-
-});
-
 
 /* NOTIFICATION SOUND */
 
@@ -1395,9 +1383,7 @@ function updateSettingsUI(){
 
  document.getElementById("imageInput").disabled=!settings.visionEnabled;
 
- if(settings.voice){
-  document.getElementById("voiceSelect").value=settings.voice;
- }
+ document.getElementById("voiceSelect").value=settings.voice||"";
 
 }
 
@@ -1421,6 +1407,10 @@ function voiceInput(){
   promptBox.value=e.results[0][0].transcript;
  };
 
+ recognition.onerror=e=>{
+  console.error("Voice recognition error:",e.error);
+ };
+
  recognition.start();
 
 }
@@ -1433,6 +1423,12 @@ document.getElementById("imageInput").addEventListener("change",e=>{
  const file=e.target.files[0];
 
  if(!file)return;
+
+ if(!settings.visionEnabled){
+  alert("Image selection is disabled.");
+  e.target.value="";
+  return;
+ }
 
  selectedImage=file;
 
@@ -1465,7 +1461,7 @@ updateSettingsUI();
 loadVoices();
 renderHistory();
 
-console.log("DELTA KING AI V2.0 ONLINE");
+console.log("DELTA KING AI V2.1 ONLINE");
 
 </script>
 
