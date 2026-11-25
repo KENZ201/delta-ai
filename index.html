@@ -3,428 +3,232 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DELTA KING AI</title>
+<title>DELTA AI — KING EDITION</title>
 
 <style>
 *{box-sizing:border-box}
-
 :root{
- --bg:#07111f;
- --panel:#091625;
- --surface:#102036;
- --surface2:#122238;
- --border:#243c58;
- --text:#eaf3ff;
- --muted:#8ba5c2;
- --accent:#1685ef;
+ --bg:#030814;--panel:#09172b;--surface:#10243d;
+ --surface2:#122238;--border:#294765;
+ --text:#eaf3ff;--muted:#8ba5c2;
 }
-
 body.light{
- --bg:#edf4fc;
- --panel:#ffffff;
- --surface:#e2edf9;
- --surface2:#f5f8fc;
- --border:#c6d7e9;
- --text:#172a40;
- --muted:#60758c;
- --accent:#0878df;
+ --bg:#edf4fc;--panel:#fff;--surface:#e2edf9;
+ --surface2:#f5f8fc;--border:#c6d7e9;
+ --text:#172a40;--muted:#60758c;
 }
-
 body{
- margin:0;
- background:var(--bg);
- color:var(--text);
- font-family:Arial,sans-serif;
- height:100vh;
- overflow:hidden;
- transition:.2s;
+ margin:0;background:
+ radial-gradient(ellipse at 75% 12%,rgba(25,89,160,.2),transparent 38%),
+ radial-gradient(ellipse at 18% 82%,rgba(92,38,168,.13),transparent 36%),
+ var(--bg);
+ color:var(--text);font-family:Arial,sans-serif;
+ height:100vh;overflow:hidden;transition:.2s;
 }
-
 button,textarea,input,select{font:inherit}
 button{cursor:pointer}
+body:before,body:after{
+ content:"";position:fixed;inset:-20%;pointer-events:none;z-index:0;
+ background-image:
+ radial-gradient(2px 2px at 12% 18%,#fff 45%,transparent 60%),
+ radial-gradient(1px 1px at 28% 72%,#9bdcff 45%,transparent 60%),
+ radial-gradient(2px 2px at 66% 35%,#fff 45%,transparent 60%),
+ radial-gradient(1px 1px at 82% 78%,#b9a5ff 45%,transparent 60%),
+ radial-gradient(1px 1px at 47% 52%,#fff 45%,transparent 60%),
+ radial-gradient(2px 2px at 91% 14%,#8ad8ff 45%,transparent 60%);
+ background-size:360px 300px;opacity:.48;
+ animation:starDrift 85s linear infinite;
+}
+body:after{opacity:.25;background-size:520px 430px;animation-duration:125s;animation-direction:reverse}
+@keyframes starDrift{to{transform:translate3d(-120px,90px,0)}}
+@keyframes pulse{to{transform:scale(1.08);box-shadow:0 0 60px #168bff}}
+@keyframes blink{50%{opacity:.3}}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes orbRing{to{transform:rotate(360deg)}}
+@keyframes rocketLaunch{0%,100%{transform:translate(0,3px) rotate(-12deg)}50%{transform:translate(8px,-7px) rotate(-24deg)}}
+@keyframes scanLine{from{transform:translateX(-110%)}to{transform:translateX(250%)}}
 
-.app{display:flex;height:100vh}
-
+.app{display:flex;height:100vh;position:relative;z-index:1}
 .sidebar{
- width:265px;
- background:var(--panel);
- border-right:1px solid var(--border);
- padding:20px;
- display:flex;
- flex-direction:column;
+ width:265px;flex:none;padding:20px;display:flex;flex-direction:column;
+ background:linear-gradient(180deg,rgba(7,18,39,.97),rgba(5,10,25,.96));
+ border-right:1px solid rgba(75,157,255,.28);
+ box-shadow:8px 0 35px #0004;position:relative;overflow:hidden;
 }
-
-.logo{
- font-size:23px;
- font-weight:900;
- letter-spacing:2px;
- color:#65baff;
- margin-bottom:30px;
+.sidebar:before{
+ content:"";position:absolute;width:230px;height:230px;left:-130px;bottom:8%;
+ border-radius:50%;border:1px solid #4aa4ff29;
+ box-shadow:0 0 0 18px #4aa4ff08,0 0 0 38px #4aa4ff05;
+ animation:orbRing 18s linear infinite;pointer-events:none;
 }
-
-.logo span{color:var(--text)}
-
+.logo{position:relative;font-size:25px;font-weight:900;letter-spacing:2px;color:#a9dcff;text-shadow:0 0 18px #168bff88;margin-bottom:30px}
+.logo span{color:#fff}
+.logo small{display:block;margin:7px 0 0 2px;font-size:9px;letter-spacing:4px;color:#7eaedb}
 .newchat{
- width:100%;
- padding:13px;
- border:1px solid #287bca;
- background:#102b46;
- color:white;
- border-radius:10px;
- cursor:pointer;
+ position:relative;width:100%;padding:13px;color:white;border-radius:10px;
+ background:linear-gradient(110deg,#123c70,#14254c);
+ border:1px solid #328de8;box-shadow:0 0 18px #167fe833;
+ transition:.25s;
 }
-
-.label{
- font-size:11px;
- letter-spacing:2px;
- color:var(--muted);
- margin:25px 5px 10px;
-}
-
-#chatHistory{overflow-y:auto;flex:1}
-
+.newchat:hover{transform:translateY(-2px);box-shadow:0 0 25px #168bff77}
+.label{font-size:11px;letter-spacing:2px;color:var(--muted);margin:25px 5px 10px}
+#chatHistory{overflow-y:auto;flex:1;position:relative}
 .history-item{display:flex;gap:5px;margin-bottom:7px}
-
 .history-open{
- flex:1;
- min-width:0;
- text-align:left;
- overflow:hidden;
- white-space:nowrap;
- text-overflow:ellipsis;
- padding:11px;
- background:var(--surface);
- color:var(--text);
- border:1px solid transparent;
- border-radius:8px;
+ flex:1;min-width:0;text-align:left;overflow:hidden;
+ white-space:nowrap;text-overflow:ellipsis;padding:11px;
+ background:var(--surface);color:var(--text);
+ border:1px solid transparent;border-radius:8px;
 }
-
-.history-delete{
- background:#281a26;
- color:#ff8b9c;
- border:0;
- border-radius:8px;
- padding:8px;
-}
-
-.sidebar-footer{
- color:var(--muted);
- font-size:11px;
- padding-top:12px;
-}
-
-.main{
- flex:1;
- display:flex;
- flex-direction:column;
- min-width:0;
-}
-
+.history-delete{background:#281a26;color:#ff8b9c;border:0;border-radius:8px;padding:8px}
+.sidebar-footer{position:relative;color:#6e9bc5;font-size:11px;padding-top:12px}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
 .topbar{
- height:65px;
- border-bottom:1px solid var(--border);
- display:flex;
- align-items:center;
- justify-content:space-between;
- padding:0 25px;
+ height:65px;flex:none;border-bottom:1px solid #4f97eb40;
+ display:flex;align-items:center;justify-content:space-between;padding:0 25px;
+ background:#050d1dcc;backdrop-filter:blur(14px);
 }
-
-.top-title{font-weight:bold;letter-spacing:2px}
-
+.top-title{font-size:14px;font-weight:bold;letter-spacing:2px;color:#d9efff}
+.edition-tag{
+ margin-left:8px;padding:4px 8px;border-radius:20px;font-size:9px;
+ letter-spacing:1.5px;color:#9ed8ff;border:1px solid #347ec5;background:#0b2442;
+}
 .top-actions{display:flex;gap:9px;align-items:center}
-
 .mode,.settings-button{
- background:var(--surface);
- color:var(--text);
- border:1px solid var(--border);
- padding:9px 14px;
- border-radius:20px;
+ background:#0b2039;color:#9bd5ff;border:1px solid #397ab5;
+ padding:9px 14px;border-radius:20px;
 }
-
-.settings-button{color:#65baff}
-
+#modeButton.pro-mode{
+ background:linear-gradient(100deg,#173d69,#32245e);
+ color:#e0caff;border-color:#9b70ed;box-shadow:0 0 17px #8955e955;
+}
+.settings-button{background:#102642;border-color:#347ec5}
 .chat-area{
- flex:1;
- overflow-y:auto;
- padding:25px;
+ flex:1;overflow-y:auto;padding:25px;
+ background:linear-gradient(180deg,#040c1b20,#040a172c);
 }
-
-.welcome{
- text-align:center;
- margin:9vh auto 35px;
- max-width:600px;
-}
-
+.welcome{text-align:center;margin:9vh auto 35px;max-width:600px}
 .orb{
- width:115px;
- height:115px;
- margin:0 auto 25px;
- border-radius:50%;
- background:radial-gradient(circle at 35% 30%,#b7eaff,#348bff 35%,#08244d 70%);
- box-shadow:0 0 35px #168bff,0 0 90px #0872ff55;
+ position:relative;width:115px;height:115px;margin:0 auto 25px;border-radius:50%;
+ background:radial-gradient(circle at 35% 28%,#fff,#9be4ff 12%,#358fff 34%,#4d3aa8 60%,#07152d 76%);
+ box-shadow:0 0 25px #249fff,0 0 65px #176cff77,0 0 110px #633eff33;
  animation:pulse 3s infinite alternate;
 }
-
-@keyframes pulse{
- to{transform:scale(1.08);box-shadow:0 0 60px #168bff}
+.orb:after{
+ content:"";position:absolute;inset:-13px;border-radius:50%;
+ border:1px solid #6fc5ff8c;border-top-color:transparent;
+ animation:orbRing 7s linear infinite;
 }
-
-.welcome h1{font-size:35px;margin:10px}
-.welcome p{color:var(--muted);line-height:1.6}
-
+.welcome h1{font-size:35px;margin:10px;color:#e8f5ff;text-shadow:0 0 22px #319dff66;letter-spacing:1px}
+.welcome p{color:#9bb8d8;line-height:1.6}
 .messages{max-width:850px;margin:auto}
-
 .message{
- max-width:80%;
- padding:14px 17px;
- margin:15px 0;
- border-radius:15px;
- line-height:1.55;
- white-space:pre-wrap;
- overflow-wrap:anywhere;
+ max-width:80%;padding:14px 17px;margin:15px 0;border-radius:15px;
+ line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;
+ backdrop-filter:blur(10px);box-shadow:0 8px 24px #0002;
 }
-
-.user{
- background:#174675;
- margin-left:auto;
- border:1px solid #2877ba;
- color:white;
+.user{background:linear-gradient(120deg,#174675,#273b79);margin-left:auto;border:1px solid #438ee0;color:white}
+.ai{background:linear-gradient(135deg,#0e223df0,#0d172eee);border:1px solid #284a72;margin-right:auto}
+.thinking{
+ color:#9cdbff!important;position:relative;padding-left:48px!important;
+ border:1px solid #367fbd!important;overflow:hidden;animation:blink 1s infinite;
 }
-
-.ai{
- background:var(--surface2);
- border:1px solid var(--border);
- margin-right:auto;
+.thinking:before{
+ content:"🚀";position:absolute;left:15px;top:11px;
+ filter:drop-shadow(0 0 8px #65caff);
+ animation:rocketLaunch 1.35s ease-in-out infinite;
 }
-
-.thinking{color:#75bdff;animation:blink 1s infinite}
-
-@keyframes blink{50%{opacity:.3}}
-
+.thinking:after{
+ content:"";position:absolute;left:0;bottom:0;width:45%;height:2px;
+ background:linear-gradient(90deg,transparent,#62c8ff,transparent);
+ animation:scanLine 1.5s ease-in-out infinite;
+}
 .composer-wrap{
- padding:15px 25px 22px;
- border-top:1px solid var(--border);
+ flex:none;padding:15px 25px 22px;border-top:1px solid #24456a;
+ background:#040c1ad4;backdrop-filter:blur(14px);
 }
-
 .composer{
- max-width:900px;
- margin:auto;
- display:flex;
- gap:9px;
- align-items:center;
- background:var(--surface);
- border:1px solid var(--border);
- border-radius:15px;
- padding:9px;
+ max-width:900px;margin:auto;display:flex;gap:9px;align-items:center;
+ background:#0d1f36f5;border:1px solid #315b83;border-radius:15px;padding:9px;
+ box-shadow:0 0 28px #167fe81c;
 }
-
 .composer textarea{
- flex:1;
- resize:none;
- background:transparent;
- border:0;
- outline:0;
- color:var(--text);
- font-size:15px;
- min-height:35px;
- max-height:120px;
- padding:9px;
+ flex:1;resize:none;background:transparent;border:0;outline:0;color:var(--text);
+ font-size:15px;min-height:35px;max-height:120px;padding:9px;
 }
+.tool{background:var(--surface2);color:var(--text);border:0;border-radius:9px;padding:11px;font-size:16px;transition:.2s}
+.tool:hover{transform:translateY(-2px);color:#9bdcff}
+.send{background:linear-gradient(135deg,#1685ef,#6252dc);color:white;padding:11px 17px;box-shadow:0 0 16px #287fff55}
+#imagePreview{max-width:100px;max-height:80px;display:none;margin:8px}
+.note{text-align:center;color:var(--muted);font-size:11px;margin-top:10px}
 
-.tool{
- background:var(--surface2);
- color:var(--text);
- border:0;
- border-radius:9px;
- padding:11px;
- font-size:16px;
-}
-
-.send{background:#1685ef;color:white;padding:11px 17px}
-
-#imagePreview{
- max-width:100px;
- max-height:80px;
- display:none;
- margin:8px;
-}
-
-.note{
- text-align:center;
- color:var(--muted);
- font-size:11px;
- margin-top:10px;
-}
-
-/* SETTINGS OVERLAY */
-
+/* SETTINGS */
 .settings-overlay{
- position:fixed;
- inset:0;
- background:#0009;
- z-index:100;
- display:none;
- justify-content:flex-end;
+ position:fixed;inset:0;background:#0009;z-index:100;display:none;
+ justify-content:flex-end;backdrop-filter:blur(7px);
 }
-
 .settings-overlay.open{display:flex}
-
 .settings-panel{
- width:min(520px,100%);
- height:100%;
- background:var(--panel);
- border-left:1px solid var(--border);
- display:flex;
- flex-direction:column;
- box-shadow:-15px 0 50px #0005;
- animation:slideIn .25s ease;
+ width:min(520px,100%);height:100%;
+ background:linear-gradient(160deg,#09172b,#080e20);
+ border-left:1px solid var(--border);display:flex;flex-direction:column;
+ box-shadow:-15px 0 50px #0005;animation:slideIn .25s ease;
 }
-
-@keyframes slideIn{
- from{transform:translateX(100%)}
- to{transform:translateX(0)}
-}
-
 .settings-header{
- display:flex;
- align-items:center;
- justify-content:space-between;
- padding:20px;
- border-bottom:1px solid var(--border);
+ display:flex;align-items:center;justify-content:space-between;
+ padding:20px;border-bottom:1px solid var(--border);background:#0c1d34e6;
 }
-
 .settings-header h2{margin:0;font-size:21px}
-
-.close-settings{
- background:var(--surface);
- color:var(--text);
- border:1px solid var(--border);
- border-radius:9px;
- padding:9px 13px;
-}
-
-.settings-body{
- display:flex;
- flex:1;
- min-height:0;
-}
-
-.settings-nav{
- width:145px;
- padding:12px;
- border-right:1px solid var(--border);
- overflow-y:auto;
-}
-
+.close-settings{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:9px 13px}
+.settings-body{display:flex;flex:1;min-height:0}
+.settings-nav{width:145px;flex:none;padding:12px;border-right:1px solid var(--border);overflow-y:auto}
 .settings-tab{
- width:100%;
- display:block;
- text-align:left;
- padding:12px 9px;
- margin-bottom:5px;
- border:0;
- border-radius:9px;
- background:transparent;
- color:var(--muted);
- font-size:13px;
+ width:100%;display:block;text-align:left;padding:12px 9px;margin-bottom:5px;
+ border:0;border-radius:9px;background:transparent;color:var(--muted);font-size:13px;
 }
-
-.settings-tab.active{
- background:var(--surface);
- color:#65baff;
-}
-
-.settings-content{
- flex:1;
- padding:20px;
- overflow-y:auto;
-}
-
+.settings-tab.active{background:linear-gradient(100deg,#153c65,#211f4b);color:#a8dcff}
+.settings-content{flex:1;padding:20px;overflow-y:auto}
 .settings-page{display:none}
 .settings-page.active{display:block}
-
 .settings-page h3{margin:0 0 8px}
-
-.settings-description{
- color:var(--muted);
- font-size:13px;
- line-height:1.6;
- margin-bottom:20px;
-}
-
+.settings-description{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:20px}
 .setting-card{
- background:var(--surface2);
- border:1px solid var(--border);
- border-radius:12px;
- padding:15px;
- margin-bottom:13px;
+ background:linear-gradient(135deg,#10233cf5,#0d182df5);
+ border:1px solid var(--border);border-radius:12px;padding:15px;margin-bottom:13px;
 }
-
 .setting-card h4{margin:0 0 7px}
-
-.setting-card p{
- color:var(--muted);
- font-size:12px;
- line-height:1.5;
- margin:5px 0 12px;
+.setting-card p{color:var(--muted);font-size:12px;line-height:1.5;margin:5px 0 12px}
+.setting-card label{display:block;font-size:13px;margin:10px 0 7px}
+.setting-card select,.setting-card input[type="text"]{
+ width:100%;padding:11px;border-radius:8px;border:1px solid var(--border);
+ background:var(--surface);color:var(--text);
 }
-
-.setting-card label{
- display:block;
- font-size:13px;
- margin:10px 0 7px;
-}
-
-.setting-card select,
-.setting-card input[type="text"]{
- width:100%;
- padding:11px;
- border-radius:8px;
- border:1px solid var(--border);
- background:var(--surface);
- color:var(--text);
-}
-
 .setting-card input[type="range"]{width:100%}
-
-.primary-button{
- background:#1685ef;
- color:white;
- border:0;
- border-radius:8px;
- padding:10px 14px;
- margin-top:8px;
-}
-
-.danger-button{
- background:#8d2639;
- color:white;
- border:0;
- border-radius:8px;
- padding:10px 14px;
-}
-
-.toggle-row{
- display:flex;
- align-items:center;
- justify-content:space-between;
- gap:10px;
- margin-top:12px;
- font-size:13px;
-}
-
+.primary-button{background:#1685ef;color:white;border:0;border-radius:8px;padding:10px 14px;margin-top:8px}
+.danger-button{background:#8d2639;color:white;border:0;border-radius:8px;padding:10px 14px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:13px}
 .toggle-row input{width:18px;height:18px}
-
-.settings-footer{
- padding:13px 20px;
- border-top:1px solid var(--border);
- color:var(--muted);
- font-size:11px;
+.settings-footer{padding:13px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:11px}
+.builder-card{
+ display:flex;align-items:center;gap:16px;padding:19px;margin-bottom:14px;
+ border:1px solid #428bd0;border-radius:14px;
+ background:radial-gradient(circle at 10% 10%,#1d4c79,transparent 60%),linear-gradient(120deg,#101e3b,#1a1740);
+ box-shadow:0 0 28px #168bff20;
 }
+.builder-emblem{
+ width:62px;height:62px;display:grid;place-items:center;flex:none;border-radius:50%;
+ color:white;font-size:20px;font-weight:900;
+ background:radial-gradient(circle at 35% 30%,#d7f4ff,#398cff 45%,#25205e 78%);
+ box-shadow:0 0 24px #258fff88;border:1px solid #a5dcff;
+}
+.builder-role{font-size:9px;letter-spacing:2px;color:#8fcfff}
+.builder-card h2{margin:5px 0;color:white;font-size:21px;letter-spacing:1px}
+.builder-title{font-size:11px;letter-spacing:2px;color:#c7a8ff}
 
 @media(max-width:650px){
  .sidebar{width:85px;padding:10px}
  .logo{font-size:12px;letter-spacing:0}
+ .logo small{font-size:7px;letter-spacing:1px}
  .newchat{font-size:10px;padding:10px 3px}
  .label{font-size:9px}
  .history-open{font-size:10px;padding:8px}
@@ -432,6 +236,7 @@ button{cursor:pointer}
  .topbar{padding:0 10px}
  .top-actions{gap:5px}
  .mode,.settings-button{padding:8px;font-size:11px}
+ .edition-tag{display:none}
  .chat-area{padding:12px}
  .composer-wrap{padding:10px}
  .welcome h1{font-size:27px}
@@ -439,30 +244,27 @@ button{cursor:pointer}
  .settings-tab{font-size:11px;padding:10px 5px}
  .settings-content{padding:12px}
  .settings-header{padding:14px}
+ .builder-card{gap:10px;padding:13px}
+ .builder-emblem{width:48px;height:48px}
+ .builder-card h2{font-size:16px}
 }
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <aside class="sidebar">
- <div class="logo">DELTA <span>KING</span></div>
-
+ <div class="logo">✦ DELTA <span>AI</span><small>KING EDITION</small></div>
  <button class="newchat" onclick="newChat()">＋ New Chat</button>
-
  <div class="label">RECENT CHATS</div>
  <div id="chatHistory"></div>
-
- <div class="sidebar-footer">DELTA SYSTEM V2.1</div>
+ <div class="sidebar-footer">DELTA KING EDITION · V3.0</div>
 </aside>
 
 <main class="main">
-
 <header class="topbar">
- <div class="top-title">DELTA AI</div>
-
+ <div class="top-title">✦ DELTA AI <span class="edition-tag">KING EDITION</span></div>
  <div class="top-actions">
   <button class="mode" id="modeButton" onclick="switchMode()">SMART MODE</button>
   <button class="settings-button" onclick="openSettings()">⚙ SETTINGS</button>
@@ -470,329 +272,227 @@ button{cursor:pointer}
 </header>
 
 <section class="chat-area" id="chatArea">
-
  <div class="welcome" id="welcome">
   <div class="orb"></div>
-  <h1>WELCOME TO DELTA KING AI</h1>
-  <p>Your ideas. Your questions. Your universe.<br>
-  Start a conversation with DELTA.</p>
+  <h1>WELCOME TO THE DELTA UNIVERSE</h1>
+  <p>Your ideas. Your questions. Your universe.<br>Start a conversation with DELTA.</p>
  </div>
-
  <div class="messages" id="messages"></div>
-
 </section>
 
 <div class="composer-wrap">
-
  <div class="composer">
-
   <input type="file" id="imageInput" accept="image/*" hidden>
-
-  <button class="tool" id="uploadButton"
-   onclick="document.getElementById('imageInput').click()"
-   title="Upload image">＋</button>
-
-  <textarea id="prompt"
-   placeholder="Message DELTA AI..."
-   rows="1"></textarea>
-
+  <button class="tool" onclick="document.getElementById('imageInput').click()" title="Upload image">＋</button>
+  <textarea id="prompt" placeholder="Message DELTA AI..." rows="1"></textarea>
   <button class="tool" onclick="voiceInput()" title="Voice input">🎙</button>
-
   <button class="tool" onclick="speakLast()" title="Read last answer">🔊</button>
-
   <button class="tool send" onclick="sendMessage()">➤</button>
-
  </div>
-
  <img id="imagePreview">
-
- <div class="note">DELTA KING AI · Your personal AI workspace</div>
-
+ <div class="note">DELTA KING EDITION · YOUR AI COMMAND CENTER</div>
 </div>
-
 </main>
 </div>
 
-
 <!-- SETTINGS CENTER -->
-
 <div class="settings-overlay" id="settingsOverlay" onclick="overlayClose(event)">
-
- <section class="settings-panel">
-
-  <header class="settings-header">
-   <h2>⚙ DELTA SETTINGS</h2>
-   <button class="close-settings" onclick="closeSettings()">✕</button>
-  </header>
-
-  <div class="settings-body">
-
-   <nav class="settings-nav">
-
-    <button class="settings-tab active" data-page="voice">🔊 Voice</button>
-    <button class="settings-tab" data-page="appearance">🎨 Appearance</button>
-    <button class="settings-tab" data-page="quality">🧠 Responses</button>
-    <button class="settings-tab" data-page="vision">👁 Vision</button>
-    <button class="settings-tab" data-page="notifications">🔔 Notifications</button>
-    <button class="settings-tab" data-page="privacy">🔒 Privacy</button>
-    <button class="settings-tab" data-page="cookies">🍪 Cookies</button>
-    <button class="settings-tab" data-page="terms">📜 Terms</button>
-    <button class="settings-tab" data-page="about">ℹ About</button>
-
-   </nav>
-
-   <div class="settings-content">
-
-    <div class="settings-page active" id="page-voice">
-
-     <h3>Voice Settings</h3>
-     <p class="settings-description">
-      Customize how DELTA reads its answers aloud.
-     </p>
-
-     <div class="setting-card">
-      <h4>AI Voice</h4>
-      <p>Select a voice available on your device or browser.</p>
-
-      <label for="voiceSelect">Available voices</label>
-      <select id="voiceSelect"></select>
-
-      <button class="primary-button" onclick="testVoice()">▶ Test Voice</button>
-      <button class="primary-button" onclick="loadVoices()">↻ Refresh Voices</button>
-     </div>
-
-     <div class="setting-card">
-
-      <h4>Voice Speed</h4>
-      <label>Speed: <span id="rateValue">1.0</span></label>
-      <input id="voiceRate" type="range" min="0.5" max="2" step="0.1" value="1">
-
-      <h4 style="margin-top:20px">Voice Pitch</h4>
-      <label>Pitch: <span id="pitchValue">1.0</span></label>
-      <input id="voicePitch" type="range" min="0.5" max="2" step="0.1" value="1">
-
-     </div>
-
-     <div class="setting-card">
-      <div class="toggle-row">
-       <span>Automatically read AI answers</span>
-       <input type="checkbox" id="autoSpeak">
-      </div>
-      <p>When enabled, DELTA will read new answers aloud.</p>
-     </div>
-
-    </div>
-
-
-    <div class="settings-page" id="page-appearance">
-
-     <h3>Appearance</h3>
-     <p class="settings-description">Customize the look of DELTA AI.</p>
-
-     <div class="setting-card">
-      <h4>Theme</h4>
-
-      <label for="themeSelect">Choose appearance</label>
-
-      <select id="themeSelect">
-       <option value="dark">Dark Mode</option>
-       <option value="light">Light Mode</option>
-      </select>
-     </div>
-
-    </div>
-
-
-    <div class="settings-page" id="page-quality">
-
-     <h3>Response Preferences</h3>
-     <p class="settings-description">
-      These preferences are sent to the DELTA AI backend with each message.
-     </p>
-
-     <div class="setting-card">
-      <h4>Answer Length</h4>
-
-      <select id="answerLength">
-       <option value="short">Short and direct</option>
-       <option value="medium">Balanced</option>
-       <option value="long">Detailed explanations</option>
-      </select>
-     </div>
-
-     <div class="setting-card">
-      <h4>Explanation Style</h4>
-
-      <select id="answerStyle">
-       <option value="simple">Simple and easy</option>
-       <option value="professional">Professional</option>
-       <option value="creative">Creative</option>
-       <option value="technical">Technical</option>
-      </select>
-     </div>
-
-    </div>
-
-
-    <div class="settings-page" id="page-vision">
-
-     <h3>Vision Settings</h3>
-     <p class="settings-description">Manage image upload preferences.</p>
-
-     <div class="setting-card">
-      <h4>Image Upload</h4>
-
-      <div class="toggle-row">
-       <span>Enable image selection</span>
-       <input type="checkbox" id="visionEnabled" checked>
-      </div>
-
-      <p>
-       Image preview and selection are supported.
-       Actual AI image understanding requires a vision-capable backend,
-       which is not connected yet.
-      </p>
-     </div>
-
-    </div>
-
-
-    <div class="settings-page" id="page-notifications">
-
-     <h3>Notifications</h3>
-     <p class="settings-description">Control DELTA's response sounds.</p>
-
-     <div class="setting-card">
-
-      <h4>Sound</h4>
-
-      <div class="toggle-row">
-       <span>Play sound when an answer arrives</span>
-       <input type="checkbox" id="soundEnabled">
-      </div>
-
-      <button class="primary-button" onclick="testSound()">Test Sound</button>
-
-     </div>
-
-    </div>
-
-
-    <div class="settings-page" id="page-privacy">
-
-     <h3>Privacy & Data</h3>
-
-     <p class="settings-description">
-      Conversations are stored in this browser's local storage.
-      They are not automatically synchronized between devices.
-     </p>
-
-     <div class="setting-card">
-      <h4>Conversation History</h4>
-      <p>Delete all locally saved DELTA conversations from this browser.</p>
-
-      <button class="danger-button" onclick="clearAllChats()">Clear All Conversations</button>
-     </div>
-
-     <div class="setting-card">
-      <h4>Settings Data</h4>
-      <p>Reset your locally saved DELTA preferences.</p>
-
-      <button class="danger-button" onclick="resetSettings()">Reset Settings</button>
-     </div>
-
-    </div>
-
-
-    <div class="settings-page" id="page-cookies">
-
-     <h3>Cookie & Storage Policy</h3>
-
-     <div class="setting-card">
-      <h4>How DELTA stores information</h4>
-
-      <p>
-       This version of DELTA AI uses browser localStorage to save
-       conversation history and settings on your device.
-      </p>
-
-      <p>
-       This code does not intentionally create tracking cookies.
-       Your browser and hosting platform may have their own storage
-       or logging practices.
-      </p>
-
-      <p>
-       Clearing browser site data may delete your saved conversations
-       and preferences.
-      </p>
-     </div>
-
-    </div>
-
-
-    <div class="settings-page" id="page-terms">
-
-     <h3>Terms of Use</h3>
-
-     <div class="setting-card">
-
-      <h4>Using DELTA AI</h4>
-
-      <p>1. Use DELTA AI responsibly and lawfully.</p>
-      <p>2. Do not use the service to harm others or break the law.</p>
-      <p>3. AI-generated answers can contain mistakes. Check important information.</p>
-      <p>4. Do not submit passwords, private account details, or sensitive information.</p>
-      <p>5. Availability depends on the hosting platform and AI service.</p>
-
-      <p>These are basic project usage guidelines, not a complete legal agreement.</p>
-
-     </div>
-
-    </div>
-
-
-    <div class="settings-page" id="page-about">
-
-     <h3>About DELTA AI</h3>
-
-     <div class="setting-card">
-
-      <h4>DELTA KING AI</h4>
-
-      <p>Version: 2.1</p>
-      <p>AI backend: Cloudflare Workers AI</p>
-      <p>Interface: HTML, CSS and JavaScript</p>
-
-      <p>
-       DELTA AI is a personal AI assistant project designed
-       for learning, creativity and productivity.
-      </p>
-
-      <p>Built with ambition. Powered by ideas.</p>
-
-     </div>
-
-    </div>
-
-   </div>
-  </div>
-
-  <footer class="settings-footer">
-   DELTA KING AI · SETTINGS CENTER · V2.1
-  </footer>
-
- </section>
+<section class="settings-panel">
+
+<header class="settings-header">
+ <h2>⚙ DELTA SETTINGS</h2>
+ <button class="close-settings" onclick="closeSettings()">✕</button>
+</header>
+
+<div class="settings-body">
+<nav class="settings-nav">
+ <button class="settings-tab active" data-page="voice">🔊 Voice</button>
+ <button class="settings-tab" data-page="appearance">🎨 Appearance</button>
+ <button class="settings-tab" data-page="quality">🧠 Responses</button>
+ <button class="settings-tab" data-page="vision">👁 Vision</button>
+ <button class="settings-tab" data-page="notifications">🔔 Notifications</button>
+ <button class="settings-tab" data-page="privacy">🔒 Privacy</button>
+ <button class="settings-tab" data-page="cookies">🍪 Cookies</button>
+ <button class="settings-tab" data-page="terms">📜 Terms</button>
+ <button class="settings-tab" data-page="development">🚀 Development</button>
+ <button class="settings-tab" data-page="about">ℹ About</button>
+</nav>
+
+<div class="settings-content">
+
+<div class="settings-page active" id="page-voice">
+ <h3>Voice Settings</h3>
+ <p class="settings-description">Customize how DELTA reads its answers aloud.</p>
+ <div class="setting-card">
+  <h4>AI Voice</h4>
+  <p>Select a voice available on your device or browser.</p>
+  <label for="voiceSelect">Available voices</label>
+  <select id="voiceSelect"></select>
+  <button class="primary-button" onclick="testVoice()">▶ Test Voice</button>
+  <button class="primary-button" onclick="loadVoices()">↻ Refresh Voices</button>
+ </div>
+ <div class="setting-card">
+  <h4>Voice Speed</h4>
+  <label>Speed: <span id="rateValue">1.0</span></label>
+  <input id="voiceRate" type="range" min="0.5" max="2" step="0.1" value="1">
+  <h4 style="margin-top:20px">Voice Pitch</h4>
+  <label>Pitch: <span id="pitchValue">1.0</span></label>
+  <input id="voicePitch" type="range" min="0.5" max="2" step="0.1" value="1">
+ </div>
+ <div class="setting-card">
+  <div class="toggle-row"><span>Automatically read AI answers</span><input type="checkbox" id="autoSpeak"></div>
+  <p>When enabled, DELTA will read new answers aloud.</p>
+ </div>
 </div>
 
+<div class="settings-page" id="page-appearance">
+ <h3>Appearance</h3>
+ <p class="settings-description">Customize the look of DELTA AI.</p>
+ <div class="setting-card">
+  <h4>Theme</h4>
+  <label for="themeSelect">Choose appearance</label>
+  <select id="themeSelect">
+   <option value="dark">Dark Mode</option>
+   <option value="light">Light Mode</option>
+  </select>
+ </div>
+</div>
+
+<div class="settings-page" id="page-quality">
+ <h3>Response Preferences</h3>
+ <p class="settings-description">These preferences are sent to the DELTA AI backend with each message.</p>
+ <div class="setting-card">
+  <h4>Answer Length</h4>
+  <select id="answerLength">
+   <option value="short">Short and direct</option>
+   <option value="medium">Balanced</option>
+   <option value="long">Detailed explanations</option>
+  </select>
+ </div>
+ <div class="setting-card">
+  <h4>Explanation Style</h4>
+  <select id="answerStyle">
+   <option value="simple">Simple and easy</option>
+   <option value="professional">Professional</option>
+   <option value="creative">Creative</option>
+   <option value="technical">Technical</option>
+  </select>
+ </div>
+</div>
+
+<div class="settings-page" id="page-vision">
+ <h3>Vision Settings</h3>
+ <p class="settings-description">Manage image upload preferences.</p>
+ <div class="setting-card">
+  <h4>Image Upload</h4>
+  <div class="toggle-row"><span>Enable image selection</span><input type="checkbox" id="visionEnabled" checked></div>
+  <p>Image preview and selection are supported. Actual AI image understanding requires a vision-capable backend, which is not connected yet.</p>
+ </div>
+</div>
+
+<div class="settings-page" id="page-notifications">
+ <h3>Notifications</h3>
+ <p class="settings-description">Control DELTA's response sounds.</p>
+ <div class="setting-card">
+  <h4>Sound</h4>
+  <div class="toggle-row"><span>Play sound when an answer arrives</span><input type="checkbox" id="soundEnabled"></div>
+  <button class="primary-button" onclick="testSound()">Test Sound</button>
+ </div>
+</div>
+
+<div class="settings-page" id="page-privacy">
+ <h3>Privacy & Data</h3>
+ <p class="settings-description">Conversations are stored in this browser's local storage. They are not automatically synchronized between devices.</p>
+ <div class="setting-card">
+  <h4>Conversation History</h4>
+  <p>Delete all locally saved DELTA conversations from this browser.</p>
+  <button class="danger-button" onclick="clearAllChats()">Clear All Conversations</button>
+ </div>
+ <div class="setting-card">
+  <h4>Settings Data</h4>
+  <p>Reset your locally saved DELTA preferences.</p>
+  <button class="danger-button" onclick="resetSettings()">Reset Settings</button>
+ </div>
+</div>
+
+<div class="settings-page" id="page-cookies">
+ <h3>Cookie & Storage Policy</h3>
+ <div class="setting-card">
+  <h4>How DELTA stores information</h4>
+  <p>This version of DELTA AI uses browser localStorage to save conversation history and settings on your device.</p>
+  <p>This code does not intentionally create tracking cookies. Your browser and hosting platform may have their own storage or logging practices.</p>
+  <p>Clearing browser site data may delete your saved conversations and preferences.</p>
+ </div>
+</div>
+
+<div class="settings-page" id="page-terms">
+ <h3>Terms of Use</h3>
+ <div class="setting-card">
+  <h4>Using DELTA AI</h4>
+  <p>1. Use DELTA AI responsibly and lawfully.</p>
+  <p>2. Do not use the service to harm others or break the law.</p>
+  <p>3. AI-generated answers can contain mistakes. Check important information.</p>
+  <p>4. Do not submit passwords, private account details, or sensitive information.</p>
+  <p>5. Availability depends on the hosting platform and AI service.</p>
+  <p>These are basic project usage guidelines, not a complete legal agreement.</p>
+ </div>
+</div>
+
+<div class="settings-page" id="page-development">
+ <h3>🚀 DEVELOPMENT</h3>
+ <p class="settings-description">The people, ideas and ambition behind the DELTA AI project.</p>
+ <div class="builder-card">
+  <div class="builder-emblem">KA</div>
+  <div>
+   <div class="builder-role">FOUNDER · SOLO BUILDER</div>
+   <h2>KHANZ AZAM</h2>
+   <div class="builder-title">CEO &amp; BRAIN WORKER</div>
+  </div>
+ </div>
+ <div class="setting-card">
+  <h4>About the Builder</h4>
+  <p>Khanz Azam is the founder and main builder of DELTA AI. He is interested in artificial intelligence, coding, game creation and creative technology projects.</p>
+ </div>
+ <div class="setting-card">
+  <h4>The Inspiration</h4>
+  <p>DELTA AI is built from a big idea: create a personal AI workspace that brings learning, creativity, useful tools and intelligent assistance together in one place.</p>
+ </div>
+ <div class="setting-card">
+  <h4>The Mission</h4>
+  <p>Keep learning, keep building and keep improving DELTA step by step. The goal is to make the project more capable, useful and reliable with every upgrade.</p>
+ </div>
+ <div class="setting-card">
+  <h4>Development Status</h4>
+  <p>Version 3.0 · KING EDITION interface upgrade</p>
+  <p>Founder: Khanz Azam</p>
+  <p>Team: One builder. One vision.</p>
+ </div>
+</div>
+
+<div class="settings-page" id="page-about">
+ <h3>About DELTA AI</h3>
+ <div class="setting-card">
+  <h4>DELTA AI — KING EDITION</h4>
+  <p>Version: 3.0</p>
+  <p>AI backend: Cloudflare Workers AI</p>
+  <p>Interface: HTML, CSS and JavaScript</p>
+  <p>DELTA AI is a personal AI assistant project designed for learning, creativity and productivity.</p>
+  <p>Built with ambition. Powered by ideas.</p>
+ </div>
+</div>
+
+</div>
+</div>
+
+<footer class="settings-footer">DELTA KING EDITION · COMMAND CENTER · V3.0</footer>
+</section>
+</div>
 
 <script>
-
 const STORAGE_KEY="DELTA_KING_CONVERSATIONS_V1";
 const SETTINGS_KEY="DELTA_KING_SETTINGS_V2";
 
 let chats=[];
-
 try{
  chats=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
  if(!Array.isArray(chats))chats=[];
@@ -808,19 +508,12 @@ const welcome=document.getElementById("welcome");
 const promptBox=document.getElementById("prompt");
 
 const defaultSettings={
- voice:"",
- rate:1,
- pitch:1,
- autoSpeak:false,
- theme:"dark",
- answerLength:"medium",
- answerStyle:"simple",
- visionEnabled:true,
- soundEnabled:false
+ voice:"",rate:1,pitch:1,autoSpeak:false,
+ theme:"dark",answerLength:"medium",answerStyle:"simple",
+ visionEnabled:true,soundEnabled:false
 };
 
 let settings={...defaultSettings};
-
 try{
  const saved=JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}");
  settings={...defaultSettings,...saved};
@@ -835,125 +528,83 @@ function saveChats(){
 }
 
 function renderHistory(){
-
  const box=document.getElementById("chatHistory");
  box.innerHTML="";
-
  chats.forEach(chat=>{
-
   const row=document.createElement("div");
   row.className="history-item";
-
   const open=document.createElement("button");
   open.className="history-open";
   open.textContent="◈ "+chat.title;
   open.onclick=()=>openChat(chat.id);
-
   const del=document.createElement("button");
   del.className="history-delete";
   del.textContent="×";
   del.title="Delete chat";
-
   del.onclick=()=>{
-
    if(!confirm("Delete this conversation?"))return;
-
    chats=chats.filter(c=>c.id!==chat.id);
-
    if(activeChat===chat.id){
     activeChat=null;
     messages.innerHTML="";
     welcome.style.display="block";
    }
-
    saveChats();
    renderHistory();
   };
-
   row.append(open,del);
   box.appendChild(row);
-
  });
-
 }
 
 function newChat(){
-
- const chat={
-  id:Date.now(),
-  title:"New Conversation",
-  messages:[]
- };
-
+ const chat={id:Date.now(),title:"New Conversation",messages:[]};
  chats.unshift(chat);
  activeChat=chat.id;
  messages.innerHTML="";
  welcome.style.display="block";
-
  saveChats();
  renderHistory();
  promptBox.focus();
-
 }
 
 function openChat(id){
-
  const chat=chats.find(c=>c.id===id);
  if(!chat)return;
-
  activeChat=id;
  messages.innerHTML="";
-
  chat.messages.forEach(m=>addMessage(m.text,m.type,false));
-
  welcome.style.display=chat.messages.length?"none":"block";
-
 }
 
 function ensureChat(){
-
  if(!activeChat)newChat();
-
  return chats.find(c=>c.id===activeChat);
-
 }
 
 function addMessage(text,type,save=true){
-
  const div=document.createElement("div");
  div.className="message "+type;
  div.textContent=text;
-
  messages.appendChild(div);
  welcome.style.display="none";
 
  if(save){
-
   const chat=ensureChat();
-
   chat.messages.push({text,type});
-
   if(chat.title==="New Conversation"&&type==="user"){
    chat.title=text.slice(0,28)+(text.length>28?"...":"");
   }
-
   saveChats();
   renderHistory();
-
  }
-
  document.getElementById("chatArea").scrollTop=
  document.getElementById("chatArea").scrollHeight;
-
 }
 
-
 /* DELTA AI CONNECTION */
-
 async function sendMessage(){
-
  const text=promptBox.value.trim();
-
  if(!text&&!selectedImage)return;
 
  if(selectedImage&&!settings.visionEnabled){
@@ -962,40 +613,27 @@ async function sendMessage(){
  }
 
  if(text)addMessage(text,"user");
-
- if(selectedImage){
-  addMessage("Image attached: "+selectedImage.name,"user");
- }
+ if(selectedImage)addMessage("Image attached: "+selectedImage.name,"user");
 
  promptBox.value="";
  selectedImage=null;
-
  document.getElementById("imagePreview").style.display="none";
  document.getElementById("imageInput").value="";
 
  const thinking=document.createElement("div");
  thinking.className="message ai thinking";
  thinking.textContent="DELTA is thinking...";
-
  messages.appendChild(thinking);
 
  try{
-
   const chat=ensureChat();
-
-  const conversation=chat.messages
-   .slice(-20)
-   .map(m=>({
-    role:m.type==="ai"?"assistant":"user",
-    content:m.text
-   }));
-
-  /* Convert the interface settings into Worker settings */
+  const conversation=chat.messages.slice(-20).map(m=>({
+   role:m.type==="ai"?"assistant":"user",
+   content:m.text
+  }));
 
   const responseLength={
-   short:"short",
-   medium:"balanced",
-   long:"detailed"
+   short:"short",medium:"balanced",long:"detailed"
   }[settings.answerLength]||"balanced";
 
   const responseStyle={
@@ -1009,151 +647,96 @@ async function sendMessage(){
    "https://delta-ai-brain.khanzazam007.workers.dev",
    {
     method:"POST",
-    headers:{
-     "Content-Type":"application/json"
-    },
+    headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-
      messages:conversation,
-
-     mode:mode,
-
+     mode:mode==="PRO"?"KING":mode,
      responseLength:responseLength,
-
      responseStyle:responseStyle
-
     })
    }
   );
 
   const data=await response.json();
-
-  if(!response.ok){
-   throw new Error(data.error||"AI connection failed");
-  }
+  if(!response.ok)throw new Error(data.error||"AI connection failed");
 
   thinking.remove();
-
   const answer=data.reply||"DELTA could not generate a response.";
-
   addMessage(answer,"ai");
-
   if(settings.autoSpeak)speakText(answer);
-
   if(settings.soundEnabled)playNotification();
 
  }catch(error){
-
   thinking.remove();
-
-  addMessage(
-   "DELTA connection error: "+error.message,
-   "ai"
-  );
-
+  addMessage("DELTA connection error: "+error.message,"ai");
   console.error("DELTA AI ERROR:",error);
-
  }
-
 }
-
 
 /* MODE SYSTEM */
-
 function switchMode(){
-
- mode=mode==="SMART"?"KING":"SMART";
-
- document.getElementById("modeButton").textContent=mode+" MODE";
-
+ mode=mode==="SMART"?"PRO":"SMART";
+ const button=document.getElementById("modeButton");
+ button.textContent=mode==="PRO"?"PRO MODE":"SMART MODE";
+ button.classList.toggle("pro-mode",mode==="PRO");
 }
 
-
 /* SETTINGS NAVIGATION */
-
 function openSettings(){
-
  document.getElementById("settingsOverlay").classList.add("open");
-
  loadVoices();
  updateSettingsUI();
-
 }
 
 function closeSettings(){
-
  document.getElementById("settingsOverlay").classList.remove("open");
-
 }
 
 function overlayClose(event){
-
- if(event.target.id==="settingsOverlay"){
-  closeSettings();
- }
-
+ if(event.target.id==="settingsOverlay")closeSettings();
 }
 
 document.querySelectorAll(".settings-tab").forEach(button=>{
-
  button.addEventListener("click",()=>{
-
   document.querySelectorAll(".settings-tab").forEach(b=>b.classList.remove("active"));
   document.querySelectorAll(".settings-page").forEach(p=>p.classList.remove("active"));
-
   button.classList.add("active");
-
   document.getElementById("page-"+button.dataset.page).classList.add("active");
-
  });
-
 });
 
 document.addEventListener("keydown",e=>{
-
  if(e.key==="Escape")closeSettings();
-
 });
 
-
 /* VOICE SYSTEM */
-
 function loadVoices(){
-
  if(!("speechSynthesis" in window)){
   document.getElementById("voiceSelect").innerHTML="<option>Voice unavailable</option>";
   return;
  }
 
  availableVoices=speechSynthesis.getVoices();
-
  const select=document.getElementById("voiceSelect");
  select.innerHTML="";
 
  if(!availableVoices.length){
-
   const option=document.createElement("option");
   option.textContent="Loading voices...";
   select.appendChild(option);
   return;
-
  }
 
  availableVoices.forEach(voice=>{
-
   const option=document.createElement("option");
-
   option.value=voice.voiceURI;
   option.textContent=voice.name+" ("+voice.lang+")";
-
   select.appendChild(option);
-
  });
 
  if(settings.voice&&availableVoices.some(v=>v.voiceURI===settings.voice)){
   select.value=settings.voice;
  }
-
 }
 
 if("speechSynthesis" in window){
@@ -1161,267 +744,167 @@ if("speechSynthesis" in window){
 }
 
 function speakText(text){
-
  if(!("speechSynthesis" in window)){
   alert("Speech is not supported in this browser.");
   return;
  }
-
  speechSynthesis.cancel();
-
  const utterance=new SpeechSynthesisUtterance(text);
-
  const voice=availableVoices.find(v=>v.voiceURI===settings.voice);
-
  if(voice)utterance.voice=voice;
-
  utterance.rate=Number(settings.rate)||1;
  utterance.pitch=Number(settings.pitch)||1;
-
  speechSynthesis.speak(utterance);
-
 }
 
 function testVoice(){
-
  speakText("Hello! I am DELTA AI. This is a preview of my selected voice.");
-
 }
 
 function speakLast(){
-
  const last=[...messages.querySelectorAll(".ai")].pop();
-
  if(!last){
   alert("No AI response yet.");
   return;
  }
-
  speakText(last.textContent);
-
 }
 
 document.getElementById("voiceSelect").addEventListener("change",e=>{
-
  settings.voice=e.target.value;
  saveSettings();
-
 });
 
 document.getElementById("voiceRate").addEventListener("input",e=>{
-
  settings.rate=Number(e.target.value);
-
  document.getElementById("rateValue").textContent=settings.rate.toFixed(1);
-
  saveSettings();
-
 });
 
 document.getElementById("voicePitch").addEventListener("input",e=>{
-
  settings.pitch=Number(e.target.value);
-
  document.getElementById("pitchValue").textContent=settings.pitch.toFixed(1);
-
  saveSettings();
-
 });
 
 document.getElementById("autoSpeak").addEventListener("change",e=>{
-
  settings.autoSpeak=e.target.checked;
  saveSettings();
-
 });
 
-
 /* APPEARANCE */
-
 function applyTheme(){
-
  document.body.classList.toggle("light",settings.theme==="light");
-
 }
 
 document.getElementById("themeSelect").addEventListener("change",e=>{
-
  settings.theme=e.target.value;
-
  saveSettings();
  applyTheme();
-
 });
 
-
 /* RESPONSE PREFERENCES */
-
 document.getElementById("answerLength").addEventListener("change",e=>{
-
  settings.answerLength=e.target.value;
  saveSettings();
-
 });
 
 document.getElementById("answerStyle").addEventListener("change",e=>{
-
  settings.answerStyle=e.target.value;
  saveSettings();
-
 });
-
 
 /* VISION */
-
 document.getElementById("visionEnabled").addEventListener("change",e=>{
-
  settings.visionEnabled=e.target.checked;
-
  document.getElementById("imageInput").disabled=!settings.visionEnabled;
-
  saveSettings();
-
 });
 
-
 /* NOTIFICATION SOUND */
-
 document.getElementById("soundEnabled").addEventListener("change",e=>{
-
  settings.soundEnabled=e.target.checked;
  saveSettings();
-
 });
 
 function playNotification(){
-
  try{
-
   const AudioContext=window.AudioContext||window.webkitAudioContext;
-
   if(!AudioContext)return;
-
   const context=new AudioContext();
   const oscillator=context.createOscillator();
   const gain=context.createGain();
-
   oscillator.connect(gain);
   gain.connect(context.destination);
-
   oscillator.frequency.value=660;
   gain.gain.value=0.08;
-
   oscillator.start();
-
   oscillator.stop(context.currentTime+0.15);
-
  }catch(e){}
-
 }
 
 function testSound(){
-
  playNotification();
-
 }
 
-
 /* PRIVACY */
-
 function clearAllChats(){
-
  if(!confirm("Permanently clear all DELTA conversations saved in this browser?"))return;
-
  chats=[];
  activeChat=null;
-
  messages.innerHTML="";
  welcome.style.display="block";
-
  saveChats();
  renderHistory();
-
  alert("Local conversation history cleared.");
-
 }
 
 function resetSettings(){
-
  if(!confirm("Reset all DELTA settings to their defaults?"))return;
-
  settings={...defaultSettings};
-
  saveSettings();
  updateSettingsUI();
  applyTheme();
-
  alert("Settings have been reset.");
-
 }
-
 
 /* UPDATE SETTINGS DISPLAY */
-
 function updateSettingsUI(){
-
  document.getElementById("voiceRate").value=settings.rate;
  document.getElementById("voicePitch").value=settings.pitch;
-
  document.getElementById("rateValue").textContent=Number(settings.rate).toFixed(1);
  document.getElementById("pitchValue").textContent=Number(settings.pitch).toFixed(1);
-
  document.getElementById("autoSpeak").checked=settings.autoSpeak;
-
  document.getElementById("themeSelect").value=settings.theme;
-
  document.getElementById("answerLength").value=settings.answerLength;
  document.getElementById("answerStyle").value=settings.answerStyle;
-
  document.getElementById("visionEnabled").checked=settings.visionEnabled;
-
  document.getElementById("soundEnabled").checked=settings.soundEnabled;
-
  document.getElementById("imageInput").disabled=!settings.visionEnabled;
-
  document.getElementById("voiceSelect").value=settings.voice||"";
-
 }
 
-
 /* MICROPHONE */
-
 function voiceInput(){
-
  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-
  if(!SpeechRecognition){
   alert("Voice recognition is not supported in this browser.");
   return;
  }
-
  const recognition=new SpeechRecognition();
-
  recognition.lang="en-US";
-
  recognition.onresult=e=>{
   promptBox.value=e.results[0][0].transcript;
  };
-
  recognition.onerror=e=>{
   console.error("Voice recognition error:",e.error);
  };
-
  recognition.start();
-
 }
 
-
 /* IMAGE PREVIEW */
-
 document.getElementById("imageInput").addEventListener("change",e=>{
-
  const file=e.target.files[0];
-
  if(!file)return;
 
  if(!settings.visionEnabled){
@@ -1431,39 +914,26 @@ document.getElementById("imageInput").addEventListener("change",e=>{
  }
 
  selectedImage=file;
-
  const preview=document.getElementById("imagePreview");
-
  preview.src=URL.createObjectURL(file);
  preview.style.display="block";
-
 });
-
 
 /* ENTER TO SEND */
-
 promptBox.addEventListener("keydown",e=>{
-
  if(e.key==="Enter"&&!e.shiftKey){
-
   e.preventDefault();
   sendMessage();
-
  }
-
 });
 
-
 /* INITIALIZE */
-
 applyTheme();
 updateSettingsUI();
 loadVoices();
 renderHistory();
 
-console.log("DELTA KING AI V2.1 ONLINE");
-
+console.log("DELTA KING AI V3.0 ONLINE");
 </script>
-
 </body>
 </html>
